@@ -1,0 +1,15 @@
+{
+  "name": "first-qa-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "agent": "node src/agent.js",
+    "demo-api": "node src/demo-api.js",
+    "demo": "node src/demo-runner.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
