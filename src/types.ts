@@ -49,3 +49,28 @@ export interface ApiCheckResult {
   body?: unknown;
   error?: string;
 }
+
+export interface UiElementSummary {
+  role: 'input' | 'button' | 'link';
+  label: string;
+  selectorHint: string;
+  visible: boolean;
+}
+
+export interface UiCheckResult {
+  name: string;
+  status: 'passed' | 'failed';
+  detail: string;
+}
+
+export interface UiAgentReport {
+  goal: string;
+  targetUrl: string;
+  finalUrl: string;
+  title: string;
+  elements: UiElementSummary[];
+  checks: UiCheckResult[];
+  screenshots: string[];
+  suggestedTests: TestSkeleton[];
+  risks: string[];
+}

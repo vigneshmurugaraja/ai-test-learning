@@ -76,7 +76,11 @@ export async function runAgent(rawArgs: string[] = process.argv.slice(2)) {
   return { reportPath: outputPath, liveResults };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+function isDirectRun(): boolean {
+  return process.argv[1] ? fileURLToPath(import.meta.url) === path.resolve(process.argv[1]) : false;
+}
+
+if (isDirectRun()) {
   runAgent().catch((error: unknown) => {
     const message = error instanceof Error ? error.stack || error.message : String(error);
     console.error(message);

@@ -14,7 +14,7 @@ From this folder:
 
 ```powershell
 npm.cmd install
-npm run demo
+npm.cmd run demo
 ```
 
 The demo starts a local dummy login API, runs the QA agent against it, then writes:
@@ -58,3 +58,32 @@ Goal -> Generate QA thinking -> Act through live checks -> Observe responses -> 
 ```
 
 The next milestone is to add Playwright so the agent can inspect and interact with a real browser UI.
+
+## Milestone 2: Playwright UI Agent
+
+Install dependencies and the Chromium browser:
+
+```powershell
+npm.cmd install
+npm.cmd run playwright:install
+```
+
+Run the SauceDemo UI agent:
+
+```powershell
+npm.cmd run agent:ui
+```
+
+The UI agent writes:
+
+```text
+reports/saucedemo-ui-agent-report.md
+reports/screenshots/saucedemo-login-page.png
+reports/screenshots/saucedemo-inventory-page.png
+```
+
+Run executable Playwright UI tests:
+
+```powershell
+npm.cmd run test:ui
+```

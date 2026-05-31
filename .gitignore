@@ -1,6 +1,9 @@
 node_modules/
 dist/
 npm-debug.log*
+playwright-report/
+test-results/
 
 reports/*.md
 !reports/.gitkeep
+reports/screenshots/

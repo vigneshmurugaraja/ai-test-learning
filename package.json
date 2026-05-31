@@ -5,15 +5,19 @@
   "type": "module",
   "scripts": {
     "agent": "tsx src/agent.ts",
+    "agent:ui": "tsx src/ui-agent.ts",
     "build": "tsc --noEmit",
     "demo-api": "tsx src/demo-api.ts",
     "demo": "tsx src/demo-runner.ts",
-    "test": "node --import tsx --test tests/*.test.ts"
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:ui": "playwright test",
+    "playwright:install": "playwright install chromium"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
     "@types/node": "^22.15.29",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"

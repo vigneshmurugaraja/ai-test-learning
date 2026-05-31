@@ -1,4 +1,6 @@
 import http from 'node:http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const port = Number(process.env.PORT || 4317);
 const validUser = {
@@ -78,7 +80,11 @@ export function createDemoApiServer(): http.Server {
   });
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+function isDirectRun(): boolean {
+  return process.argv[1] ? fileURLToPath(import.meta.url) === path.resolve(process.argv[1]) : false;
+}
+
+if (isDirectRun()) {
   const server = createDemoApiServer();
   server.listen(port, () => {
     console.log(`Dummy test API listening on http://localhost:${port}`);
