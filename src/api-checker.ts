@@ -1,10 +1,12 @@
-const defaultChecks = [
+import type { ApiCheck, ApiCheckResult } from './types.js';
+
+const defaultChecks: ApiCheck[] = [
   {
     name: 'Health endpoint is available',
     method: 'GET',
     path: '/health',
     expectedStatus: 200,
-    validate: (body) => body.ok === true
+    validate: (body) => isObject(body) && body.ok === true
   },
   {
     name: 'Valid login succeeds',
@@ -12,7 +14,7 @@ const defaultChecks = [
     path: '/login',
     body: { username: 'qa@example.com', password: 'Password123!' },
     expectedStatus: 200,
-    validate: (body) => body.ok === true && typeof body.token === 'string'
+    validate: (body) => isObject(body) && body.ok === true && typeof body.token === 'string'
   },
   {
     name: 'Invalid login fails',
@@ -20,7 +22,8 @@ const defaultChecks = [
     path: '/login',
     body: { username: 'qa@example.com', password: 'wrong' },
     expectedStatus: 401,
-    validate: (body) => body.ok === false && body.error?.code === 'INVALID_CREDENTIALS'
+    validate: (body) =>
+      isObject(body) && body.ok === false && isObject(body.error) && body.error.code === 'INVALID_CREDENTIALS'
   },
   {
     name: 'Missing password is rejected',
@@ -28,12 +31,13 @@ const defaultChecks = [
     path: '/login',
     body: { username: 'qa@example.com' },
     expectedStatus: 400,
-    validate: (body) => body.ok === false && body.error?.code === 'VALIDATION_ERROR'
+    validate: (body) =>
+      isObject(body) && body.ok === false && isObject(body.error) && body.error.code === 'VALIDATION_ERROR'
   }
 ];
 
-export async function runApiChecks(baseUrl, checks = defaultChecks) {
-  const results = [];
+export async function runApiChecks(baseUrl: string, checks: ApiCheck[] = defaultChecks): Promise<ApiCheckResult[]> {
+  const results: ApiCheckResult[] = [];
 
   for (const check of checks) {
     const startedAt = performance.now();
@@ -44,7 +48,7 @@ export async function runApiChecks(baseUrl, checks = defaultChecks) {
         body: check.body ? JSON.stringify(check.body) : undefined
       });
       const contentType = response.headers.get('content-type') || '';
-      const body = contentType.includes('application/json') ? await response.json() : await response.text();
+      const body: unknown = contentType.includes('application/json') ? await response.json() : await response.text();
       const hasExpectedStatus = response.status === check.expectedStatus;
       const hasExpectedBody = typeof check.validate === 'function' ? check.validate(body) : true;
 
@@ -58,7 +62,7 @@ export async function runApiChecks(baseUrl, checks = defaultChecks) {
         durationMs: Math.round(performance.now() - startedAt),
         body
       });
-    } catch (error) {
+    } catch (error: unknown) {
       results.push({
         name: check.name,
         status: 'failed',
@@ -67,10 +71,14 @@ export async function runApiChecks(baseUrl, checks = defaultChecks) {
         expectedStatus: check.expectedStatus,
         actualStatus: null,
         durationMs: Math.round(performance.now() - startedAt),
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }
 
   return results;
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }

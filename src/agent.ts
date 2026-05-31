@@ -1,26 +1,27 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { generateQaAnalysis } from './qa-heuristics.js';
 import { runApiChecks } from './api-checker.js';
+import { generateQaAnalysis } from './qa-heuristics.js';
 import { renderReport } from './reporter.js';
+import type { AgentMode, CliArgs } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
 
-function parseArgs(argv) {
-  const args = {};
+function parseArgs(argv: string[]): CliArgs {
+  const args: CliArgs = {};
 
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
     if (!token.startsWith('--')) continue;
 
-    const key = token.slice(2);
+    const key = token.slice(2) as keyof CliArgs;
     const next = argv[index + 1];
     if (!next || next.startsWith('--')) {
-      args[key] = true;
+      args[key] = true as never;
     } else {
-      args[key] = next;
+      args[key] = next as never;
       index += 1;
     }
   }
@@ -28,7 +29,7 @@ function parseArgs(argv) {
   return args;
 }
 
-function usage() {
+function usage(): string {
   return [
     'Usage:',
     '  npm run agent -- --feature "Login API" --url http://localhost:4317 --mode api',
@@ -41,7 +42,12 @@ function usage() {
   ].join('\n');
 }
 
-export async function runAgent(rawArgs = process.argv.slice(2)) {
+function normalizeMode(rawMode: unknown, hasUrl: boolean): AgentMode {
+  if (rawMode === 'api' || rawMode === 'plan-only') return rawMode;
+  return hasUrl ? 'api' : 'plan-only';
+}
+
+export async function runAgent(rawArgs: string[] = process.argv.slice(2)) {
   const args = parseArgs(rawArgs);
 
   if (args.help || args.h) {
@@ -50,8 +56,8 @@ export async function runAgent(rawArgs = process.argv.slice(2)) {
   }
 
   const feature = args.feature || 'User login API with username, password, session, and validation errors';
-  const mode = args.mode || (args.url ? 'api' : 'plan-only');
   const baseUrl = args.url;
+  const mode = normalizeMode(args.mode, Boolean(baseUrl));
   const outputPath = path.resolve(projectRoot, args.out || 'reports/qa-report.md');
 
   const analysis = generateQaAnalysis({ feature, baseUrl, mode });
@@ -71,8 +77,9 @@ export async function runAgent(rawArgs = process.argv.slice(2)) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runAgent().catch((error) => {
-    console.error(error.stack || error.message);
+  runAgent().catch((error: unknown) => {
+    const message = error instanceof Error ? error.stack || error.message : String(error);
+    console.error(message);
     process.exitCode = 1;
   });
 }

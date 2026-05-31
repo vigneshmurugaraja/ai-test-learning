@@ -1,12 +1,20 @@
+import type { AgentMode, QaAnalysis, TestSkeleton } from './types.js';
+
 const loginSignals = ['login', 'password', 'username', 'email', 'session', 'auth'];
 const apiSignals = ['api', 'endpoint', 'json', 'token', 'status', 'http'];
 
-function containsAny(text, words) {
+interface GenerateQaAnalysisInput {
+  feature: string;
+  baseUrl?: string;
+  mode: AgentMode;
+}
+
+function containsAny(text: string, words: string[]): boolean {
   const normalized = text.toLowerCase();
   return words.some((word) => normalized.includes(word));
 }
 
-export function generateQaAnalysis({ feature, baseUrl, mode }) {
+export function generateQaAnalysis({ feature, baseUrl, mode }: GenerateQaAnalysisInput): QaAnalysis {
   const isLoginLike = containsAny(feature, loginSignals);
   const isApiLike = mode === 'api' || containsAny(feature, apiSignals);
 
@@ -64,7 +72,7 @@ export function generateQaAnalysis({ feature, baseUrl, mode }) {
   };
 }
 
-function buildApiSkeletons(baseUrl) {
+function buildApiSkeletons(baseUrl: string): TestSkeleton[] {
   return [
     {
       name: 'valid login returns success',
@@ -112,7 +120,7 @@ function buildApiSkeletons(baseUrl) {
   ];
 }
 
-function buildPlaywrightSkeletons(baseUrl) {
+function buildPlaywrightSkeletons(baseUrl: string): TestSkeleton[] {
   return [
     {
       name: 'page loads and exposes primary action',

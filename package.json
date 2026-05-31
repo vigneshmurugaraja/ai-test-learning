@@ -4,12 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "agent": "node src/agent.js",
-    "demo-api": "node src/demo-api.js",
-    "demo": "node src/demo-runner.js",
-    "test": "node --test"
+    "agent": "tsx src/agent.ts",
+    "build": "tsc --noEmit",
+    "demo-api": "tsx src/demo-api.ts",
+    "demo": "tsx src/demo-runner.ts",
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }

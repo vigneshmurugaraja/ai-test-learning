@@ -1,5 +1,5 @@
-import { createDemoApiServer } from './demo-api.js';
 import { runAgent } from './agent.js';
+import { createDemoApiServer } from './demo-api.js';
 
 const port = 4317;
 const baseUrl = `http://localhost:${port}`;

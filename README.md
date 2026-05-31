@@ -1,6 +1,6 @@
 # First QA Agent
 
-This is a small first milestone for learning how agents can help QA work.
+This is a small TypeScript first milestone for learning how agents can help QA work.
 
 The agent does three things:
 
@@ -13,6 +13,7 @@ The agent does three things:
 From this folder:
 
 ```powershell
+npm.cmd install
 npm run demo
 ```
 
@@ -27,19 +28,25 @@ reports/demo-login-api-report.md
 Terminal 1:
 
 ```powershell
-npm run demo-api
+npm.cmd run demo-api
 ```
 
 Terminal 2:
 
 ```powershell
-npm run agent -- --feature "Login API with username and password" --url http://localhost:4317 --mode api
+npm.cmd run agent -- --feature "Login API with username and password" --url http://localhost:4317 --mode api
 ```
 
 ## Run Unit Tests
 
 ```powershell
-npm test
+npm.cmd test
+```
+
+## Type Check
+
+```powershell
+npm.cmd run build
 ```
 
 ## What to Learn From This Version

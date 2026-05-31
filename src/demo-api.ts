@@ -6,7 +6,7 @@ const validUser = {
   password: 'Password123!'
 };
 
-function sendJson(response, statusCode, payload) {
+function sendJson(response: http.ServerResponse, statusCode: number, payload: unknown): void {
   response.writeHead(statusCode, {
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store'
@@ -14,17 +14,19 @@ function sendJson(response, statusCode, payload) {
   response.end(JSON.stringify(payload, null, 2));
 }
 
-async function readJson(request) {
-  const chunks = [];
-  for await (const chunk of request) chunks.push(chunk);
+async function readJson(request: http.IncomingMessage): Promise<Record<string, unknown>> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of request) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
   const rawBody = Buffer.concat(chunks).toString('utf8');
-  return rawBody ? JSON.parse(rawBody) : {};
+  return rawBody ? (JSON.parse(rawBody) as Record<string, unknown>) : {};
 }
 
-export function createDemoApiServer() {
+export function createDemoApiServer(): http.Server {
   return http.createServer(async (request, response) => {
     try {
-      const url = new URL(request.url, `http://${request.headers.host}`);
+      const url = new URL(request.url || '/', `http://${request.headers.host}`);
 
       if (request.method === 'GET' && url.pathname === '/health') {
         sendJson(response, 200, { ok: true, service: 'dummy-login-api' });
@@ -67,10 +69,10 @@ export function createDemoApiServer() {
         ok: false,
         error: { code: 'NOT_FOUND', message: 'Route not found.' }
       });
-    } catch (error) {
+    } catch (error: unknown) {
       sendJson(response, 500, {
         ok: false,
-        error: { code: 'SERVER_ERROR', message: error.message }
+        error: { code: 'SERVER_ERROR', message: error instanceof Error ? error.message : String(error) }
       });
     }
   });

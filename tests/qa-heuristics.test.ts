@@ -1,5 +1,5 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
+import test from 'node:test';
 import { generateQaAnalysis } from '../src/qa-heuristics.js';
 
 test('generates api scenarios and skeletons for login feature', () => {
